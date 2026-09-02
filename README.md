@@ -8,16 +8,15 @@ Everything is standard-library Python and bash. There is nothing to install beyo
 
 ## What this repo adds
 
-The debugging method itself is not new, and this repo does not pretend otherwise (see the next section). What it builds is the orchestration around it:
+The debugging method itself is not new, and this repo does not pretend otherwise (see the next section). What it builds is the orchestration around it.
 
-- **A ticket queue that never forgets.** One SQLite file, `tickets.db`. Tickets are closed with a reason, never deleted, so the queue is also its own audit trail. Statuses: `open`, `triaged`, `staffed`, `fix-ready`, `qa`, `closed`.
-- **A three-question intake gate.** At filing time you can cite where the requirement already existed (a spec line, a docstring, the tool's stated purpose), give one shell command that exercises the bug, and name the signal that means the bug is present. The first question keeps the queue defects-only: if no prior document is violated, the item is a feature request and belongs somewhere else. The other two make triage deterministic.
-- **Deterministic triage.** `ticket.py triage` runs the repro command in the target repo and only stages a ticket whose bug signal actually fires. A ticket the machine cannot make fail on demand is bounced back to you with a specific question, never staffed on faith.
-- **An isolated-worktree fix loop.** Each ticket is fixed in a throwaway `git worktree` checked out on its own branch. Your live working tree never moves. If a worktree cannot be created, the loop aborts rather than degrading to the live tree.
-- **Red-capable test first.** No fix branch exists without a test that failed on the live bug before the fix and passes after. When no correct test seam exists, that is reported as the finding instead of shipping a fix nobody can lock down.
-- **QA before merge.** The loop ends at a committed branch. Review and merge are yours.
-- **Self-observability.** A reopen-rate audit records, for closed fixes you re-read later, whether you would reopen them. A self-reviewing loop that grades its own work generously is the failure this measures.
-- **A glance snapshot.** `report.py --snapshot` writes a short markdown block for whatever dashboard you look at, refreshed on every ticket change, with a line saying when the queue was last actually worked so a frozen queue never looks fresh.
+The queue is one SQLite file, `tickets.db`. Tickets are closed with a reason, never deleted, so the queue is also its own audit trail. A ticket moves through `open`, `triaged`, `staffed`, `fix-ready`, `qa` and `closed`.
+
+Filing a ticket asks three optional questions. Where did the requirement already exist (a spec line, a docstring, the tool's stated purpose)? What one shell command exercises the bug? What signal in its output means the bug is present? The first question keeps the queue defects-only: if no prior document is violated, the item is a feature request and belongs somewhere else. The other two make triage deterministic. `ticket.py triage` runs the repro command in the target repo and only stages a ticket whose bug signal actually fires. A ticket the machine cannot make fail on demand is bounced back to you with a specific question, never staffed on faith.
+
+Each ticket is then fixed in a throwaway `git worktree` checked out on its own branch, so your live working tree never moves. If a worktree cannot be created, the loop aborts rather than degrading to the live tree. No fix branch exists without a test that failed on the live bug before the fix and passes after. When no correct test seam exists, that is reported as the finding instead of shipping a fix nobody can lock down. The loop ends at a committed branch. Review and merge are yours.
+
+Two smaller pieces keep the loop honest over time. A reopen-rate audit records, for closed fixes you re-read later, whether you would reopen them, because a self-reviewing loop that grades its own work generously is the failure this measures. And `report.py --snapshot` writes a short markdown block for whatever dashboard you look at, refreshed on every ticket change, with a line saying when the queue was last actually worked so a frozen queue never looks fresh.
 
 ## The debugging discipline is Matt Pocock's
 
