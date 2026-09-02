@@ -1,0 +1,20 @@
+# Local operational state, never committed (the machine-local ticket queue)
+tickets.db
+*.db
+
+# Runtime dispatch state (per-ticket pidfiles and logs, the default snapshot target)
+run/
+
+# Real per-repo configs and the local snapshot override are machine-specific: only
+# config/example.json is tracked. See config/README.md.
+config/*.json
+!config/example.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store

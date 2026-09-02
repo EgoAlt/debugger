@@ -1,0 +1,7 @@
+{
+  "repo": "my-app",
+  "workdir": "~/repos/my-app",
+  "test_command": "python3 -m pytest -q",
+  "default_branch": "main",
+  "branch_prefix": "fix/"
+}
